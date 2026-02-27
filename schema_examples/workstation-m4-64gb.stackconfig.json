@@ -1,0 +1,45 @@
+{
+  "version": "0.1",
+  "stack_id": "workstation-m4-64gb",
+  "display_name": "Workstation: macOS M4 / 64 GB (Mac Mini-class)",
+
+  "hardware": {
+    "class": "workstation",
+    "arch": "arm64",
+    "cpu_cores": 10,
+    "cpu_model_hint": "Apple M4",
+    "gpu": {
+      "type": "metal",
+      "vram_mb": 65536,
+      "model_hint": "Apple M4 integrated (shared memory)"
+    }
+  },
+
+  "os": {
+    "distro": "macos-15",
+    "libc": "system"
+  },
+
+  "runtime": {
+    "python": "3.12",
+    "package_manager": "uv"
+  },
+
+  "resources": {
+    "ram_mb": 65536,
+    "swap_mb": 0,
+    "storage_type": "nvme",
+    "network": "full"
+  },
+
+  "enforcement": {
+    "method": "bare-metal",
+    "verified": false
+  },
+
+  "metadata": {
+    "author": "stackeval-core",
+    "platform": "local-mac",
+    "notes": "The 'easy' stack. This is what most benchmarks implicitly assume."
+  }
+}

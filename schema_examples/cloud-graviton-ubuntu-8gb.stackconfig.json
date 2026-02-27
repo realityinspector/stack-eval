@@ -1,0 +1,43 @@
+{
+  "version": "0.1",
+  "stack_id": "cloud-graviton-ubuntu-8gb",
+  "display_name": "Cloud: Ubuntu glibc ARM64 / 8 GB (AWS Graviton-class)",
+
+  "hardware": {
+    "class": "cloud-arm",
+    "arch": "arm64",
+    "cpu_cores": 4,
+    "cpu_model_hint": "AWS Graviton3",
+    "gpu": null
+  },
+
+  "os": {
+    "distro": "ubuntu-24.04",
+    "libc": "glibc",
+    "base_image": "python:3.11-bookworm"
+  },
+
+  "runtime": {
+    "python": "3.11",
+    "package_manager": "pip"
+  },
+
+  "resources": {
+    "ram_mb": 8192,
+    "swap_mb": 0,
+    "disk_mb": 30720,
+    "storage_type": "ebs",
+    "network": "full"
+  },
+
+  "enforcement": {
+    "method": "cgroup-v2",
+    "verified": true
+  },
+
+  "metadata": {
+    "author": "stackeval-core",
+    "platform": "aws-ecs",
+    "notes": "Mid-tier cloud. glibc wheels available but ARM64 + RAM cap still catches naive agents."
+  }
+}

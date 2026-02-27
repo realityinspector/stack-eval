@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stackeval.org/schema/v0.1/stackconfig.json",
+  "title": "StackConfig",
+  "description": "Declares a technology stack for StackEval benchmark runs. Any compliant platform (Railway, AWS, local, QEMU) interprets this identically.",
+  "type": "object",
+  "required": ["version", "stack_id", "hardware", "os", "runtime", "resources"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "0.1",
+      "description": "Schema version. Locked per StackEval release."
+    },
+    "stack_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{2,63}$",
+      "description": "Unique slug for this stack config. e.g. 'edge-alpine-arm-2gb', 'workstation-m4-64gb'."
+    },
+    "display_name": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "Human-readable name for leaderboard display."
+    },
+
+    "hardware": {
+      "type": "object",
+      "required": ["class", "arch"],
+      "additionalProperties": false,
+      "properties": {
+        "class": {
+          "enum": ["edge", "workstation", "cloud-x86", "cloud-arm"],
+          "description": "Hardware tier. Determines normalization bucket on leaderboard."
+        },
+        "arch": {
+          "enum": ["amd64", "arm64"],
+          "description": "CPU architecture. Maps to Docker platform flag."
+        },
+        "cpu_cores": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256,
+          "description": "Available logical CPU cores. Enforced via cgroup or equivalent."
+        },
+        "cpu_model_hint": {
+          "type": "string",
+          "description": "Optional. Informational only, not enforced. e.g. 'Apple M4', 'Graviton3', 'BCM2712 (RPi5)'."
+        },
+        "gpu": {
+          "type": ["object", "null"],
+          "description": "GPU/accelerator if available. null = none.",
+          "properties": {
+            "type": { "enum": ["cuda", "metal", "opencl", "none"] },
+            "vram_mb": { "type": "integer" },
+            "model_hint": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "os": {
+      "type": "object",
+      "required": ["distro", "libc"],
+      "additionalProperties": false,
+      "properties": {
+        "distro": {
+          "type": "string",
+          "description": "Distro identifier. e.g. 'ubuntu-24.04', 'alpine-3.20', 'fedora-41', 'macos-15'."
+        },
+        "libc": {
+          "enum": ["glibc", "musl", "system"],
+          "description": "C library. 'system' for macOS/non-Linux."
+        },
+        "kernel_version_min": {
+          "type": "string",
+          "description": "Optional minimum kernel version. e.g. '6.1'."
+        },
+        "base_image": {
+          "type": "string",
+          "description": "Docker/OCI base image if containerized. e.g. 'python:3.12-alpine3.20'. Omit for bare-metal."
+        }
+      }
+    },
+
+    "runtime": {
+      "type": "object",
+      "required": ["python"],
+      "additionalProperties": false,
+      "properties": {
+        "python": {
+          "type": "string",
+          "pattern": "^3\\.(9|1[0-9])(\\.\\d+)?$",
+          "description": "Python version. e.g. '3.12', '3.13.1'."
+        },
+        "python_flags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional CPython flags. e.g. ['--enable-experimental-jit', '-Xgil=0'] for free-threaded 3.13."
+        },
+        "package_manager": {
+          "enum": ["pip", "uv", "poetry", "conda"],
+          "default": "pip",
+          "description": "Default package manager available in the stack."
+        }
+      }
+    },
+
+    "resources": {
+      "type": "object",
+      "required": ["ram_mb"],
+      "additionalProperties": false,
+      "properties": {
+        "ram_mb": {
+          "type": "integer",
+          "minimum": 512,
+          "description": "Hard RAM cap in MB. Enforced via cgroup memory.max or equivalent."
+        },
+        "swap_mb": {
+          "type": "integer",
+          "default": 0,
+          "description": "Swap available in MB. 0 = no swap (default, recommended for realistic edge testing)."
+        },
+        "disk_mb": {
+          "type": "integer",
+          "description": "Available disk in MB. Omit for uncapped."
+        },
+        "storage_type": {
+          "enum": ["nvme", "ssd", "sd-card", "ebs", "ephemeral"],
+          "description": "Storage medium. Informational for energy modeling."
+        },
+        "network": {
+          "enum": ["full", "limited", "airgapped"],
+          "default": "full",
+          "description": "'full' = unrestricted internet. 'limited' = pypi/apt mirrors only. 'airgapped' = no network (preloaded deps only)."
+        }
+      }
+    },
+
+    "enforcement": {
+      "type": "object",
+      "description": "How resource limits are enforced. Platforms fill this at runtime.",
+      "properties": {
+        "method": {
+          "enum": ["cgroup-v2", "cgroup-v1", "docker", "qemu", "bare-metal", "other"],
+          "description": "Enforcement mechanism."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether enforcement was verified by the StackEval Rig pre-run check."
+        }
+      }
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for leaderboard and reproducibility.",
+      "properties": {
+        "author": { "type": "string" },
+        "platform": {
+          "type": "string",
+          "description": "Where this ran. e.g. 'railway', 'aws-ecs', 'local-mac', 'github-actions'."
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
