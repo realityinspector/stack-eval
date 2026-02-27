@@ -1,0 +1,37 @@
+{
+  "version": "0.1",
+  "stack_id": "edge-alpine-arm-2gb",
+  "display_name": "Edge: Alpine musl ARM64 / 2 GB (Railway-class)",
+
+  "hardware": {
+    "class": "edge",
+    "arch": "arm64",
+    "cpu_cores": 2,
+    "gpu": null
+  },
+
+  "os": {
+    "distro": "alpine-3.20",
+    "libc": "musl",
+    "base_image": "python:3.12-alpine3.20"
+  },
+
+  "runtime": {
+    "python": "3.12",
+    "package_manager": "pip"
+  },
+
+  "resources": {
+    "ram_mb": 2048,
+    "swap_mb": 0,
+    "disk_mb": 10240,
+    "storage_type": "ephemeral",
+    "network": "full"
+  },
+
+  "metadata": {
+    "author": "stackeval-core",
+    "platform": "railway",
+    "notes": "Represents cost-optimized container deploys. musl + low RAM is the key stress vector."
+  }
+}
